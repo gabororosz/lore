@@ -12,6 +12,8 @@ Ez a csomag a Lore projekt eddig előállt teljes dokumentációját tartalmazza
 
 4. **`lore-tarolasi-filozofia.md`** — a tárolási filozófia önálló, README/PRD-kész kifejtése (a koncepcióban is szerepel tömörítve, ez a részletes változat).
 
+5. **`lore-ux-terv.md`** — a „mit lát és mit csinál a felhasználó": a felületek (belépés, projekt-választó, dokumentum-fa, read/edit, új dokumentum, publish + konfliktus-felbontó, PR, AI, keresés, piszkozatok, beállítások), a rajtuk megjelenő információk és funkciók, valamint a konkrét UI-elemek, gombok és mezők.
+
 ## Diagramok (önálló fájlként is)
 
 - **`lore-architektura-diagram.mermaid`** — komponens-diagram (a színek a tárolási filozófiát kódolják: forrás / derivált / átmeneti).
