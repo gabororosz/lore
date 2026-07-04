@@ -144,7 +144,7 @@ A stratégia **kockázat-alapú**: a tesztelési erőfeszítést oda összpontos
 
 - **Teszt-GitHub-org + teszt-GitHub-App**, webhook-forwardinggal (smee.io) lokálhoz.
 - **Efemer teszt-repók** tesztfutásonként létrehozva/lebontva (a git-réteg valódi repókon dolgozik).
-- **LLM-stub a provider-absztrakció mögött:** a CI **nem** hív valódi LLM-et (költség + nemdeterminizmus) — rögzített fixtúra vagy stub-provider. Valódi LLM csak külön, ritka, jelölt tesztben.
+- **LLM-stub a provider-absztrakció mögött:** a CI **nem** hív valódi LLM-et (költség + nemdeterminizmus) — rögzített fixtúra vagy stub-provider. Valódi LLM csak külön, ritka, jelölt tesztben. A provider-konfiguráció compliance-invariánsait (region-pinnelt EU-végpont, első-féli modellcsalád) automatizált teszt őrzi, nem csak kódreview (lásd: *Kiegészítő kutatás → Google Vertex AI: EU-adatrezidencia és zero-retention/no-training*, valamint a teszteset-katalógus LLM-csoportja).
 - **testcontainers** Postgres + Redis az integrációhoz.
 
 ### Mobil-specifikus validálás

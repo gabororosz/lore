@@ -2,7 +2,7 @@
 
 *A Technikai terv → Tesztelési stratégia végrehajtható kibontása. Kockázat-alapú: a **K (kritikus)** esetek ott vannak, ahol egy hiba adatvesztést vagy -korrupciót okoz; **N (normál)** a többi. Szintek: unit · property (property-based/fuzz) · integráció · kontraktus · e2e · manuális.*
 
-**Azonosító-előtagok:** SER (szerializáció), FM (frontmatter), LINK (wiki-link), MRG (merge/publish), LOCK (lock/presence), DRAFT (piszkozat/retenció), GH (GitHub App), SSE (realtime), READ (read-forrás/badge), IMG (kép/olvasás), AUTH (auth), DEG (graceful degradation).
+**Azonosító-előtagok:** SER (szerializáció), FM (frontmatter), LINK (wiki-link), MRG (merge/publish), LOCK (lock/presence), DRAFT (piszkozat/retenció), GH (GitHub App), SSE (realtime), READ (read-forrás/badge), IMG (kép/olvasás), AUTH (auth), DEG (graceful degradation), LLM (AI/LLM-elhelyezés).
 
 ---
 
@@ -179,6 +179,19 @@ A „reviewzható, mint a kód" ígéret load-bearing pontja: a minimál-diff ne
 | DEG-02 | Egy hibás doksi **nem** állítja le az index-rebuildet (a többi doksi rendben) | integráció | K |
 | DEG-03 | Duplikált id → **mindkét** doksi látszik, ütközés-jelöléssel | e2e | N |
 | DEG-04 | Törött link → „törött" render, a környező szöveg **nem tűnik el** | e2e | N |
+
+---
+
+## 13. AI / LLM-elhelyezés (LLM)
+
+A provider-absztrakció mögötti compliance-invariánsok gépi ellenőrzése — nem elég a kódreview-ra bízni (lásd: *Kiegészítő kutatás → Google Vertex AI: EU-adatrezidencia és zero-retention/no-training*). A CI valódi LLM-et nem hív; ezek a hívás-konfigurációt és a provider-kiválasztást verifikálják stub/fixtúra mellett.
+
+| ID | Mit ellenőriz | Szint | Pri |
+|----|----------------|-------|-----|
+| LLM-01 | Minden LLM-hívás igazoltan **region-pinnelt** végpontra megy, sosem a globálisra | unit | K |
+| LLM-02 | A provider-konfiguráció **első-féli modellcsaládra** (Gemini) szűkít; MaaS-modell csak explicit engedéllyel választható | unit | K |
+| LLM-03 | Csak **EU-régió** választható a konfigurációban (nem-EU régió → hiba) | unit | K |
+| LLM-04 | A provider-absztrakció mögött a modell/szolgáltató **cserélhető** kód-átírás nélkül (stub-provider bekötése) | integráció | N |
 
 ---
 

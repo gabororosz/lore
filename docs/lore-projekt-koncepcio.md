@@ -617,6 +617,8 @@ A `/docs`-only scope már sokat segít (nem küldünk *forráskódot* LLM-nek), 
 
 **Modellspecifikus tény:** a Claude EU-adatrezidenciája nem az elsőfélként kínált API-n, hanem felhős telepítéseken (AWS Bedrock / Google Vertex AI EU-régiók) érhető el — ezt a provider-absztrakció amúgy is elfedi.
 
+**Szolgáltató-specifikus mélyfúrás:** a Google Vertex AI konkrét megfelelését (mennyire és milyen feltételekkel elégíti ki az EU-adatrezidencia + zero-retention + no-training elvet) külön kiegészítő kutatás vizsgálja — a főbb tanulságok: az adatrezidencia-garancia modellfüggő (csak a Google első-féli Gemini-modelljeire), a zero-retention külön szerződéses lépés (nem alapértelmezett), és a globális végpont csendben megszüntetheti a rezidenciát. (Lásd: *Kiegészítő kutatás → Google Vertex AI: EU-adatrezidencia és zero-retention/no-training*.)
+
 ### Következmények, amiket ez rögzít
 
 - **A megfelelőség szerződés + konfiguráció + lokáció, nem márkanév.** Az EU-adatrezidencia önmagában nem egyenlő a GDPR-megfeleléssel — a zero-retention, a no-training és a sub-processor-transzparencia legalább annyira számít, mint a földrajz.
