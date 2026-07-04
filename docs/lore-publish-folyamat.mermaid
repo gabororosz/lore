@@ -1,0 +1,61 @@
+sequenceDiagram
+    autonumber
+    actor U as Felhasználó (kliens)
+    participant API as Backend / API
+    participant L as Lock / presence
+    participant D as Piszkozat-tár
+    participant M as Sparse /docs mirror
+    participant G as Git-réteg (bot)
+    participant GH as GitHub
+
+    Note over U,GH: 1. Edit — lock + bázis-SHA rögzítése
+    U->>API: Edit (doc id)
+    API->>L: lock kérése (doc id)
+    alt lock szabad
+        L-->>API: lock megadva
+        API->>M: aktuális tartalom + HEAD SHA (docs-sync)
+        M-->>API: tartalom + bázis-SHA
+        API->>D: piszkozat létrehozása (bázis-SHA-val)
+        API-->>U: szerkeszthető nézet
+    else valaki más szerkeszti
+        L-->>API: foglalt
+        API-->>U: read-only + „X szerkeszti"
+    end
+
+    Note over U,D: 2. Szerkesztés — autosave a piszkozatba (nincs commit)
+    loop amíg szerkeszt (ember vagy AI)
+        U->>API: változás
+        API->>D: piszkozat mentése
+    end
+
+    Note over U,GH: 3. Publish — fetch → 3-way merge
+    U->>API: Publish
+    API->>G: publish (piszkozat + bázis-SHA)
+    G->>GH: fetch docs-sync (közben elmozdulhatott)
+    GH-->>G: docs-sync HEAD (blob:none, csak /docs)
+    G->>M: mirror /docs frissítése
+    Note over G: 3-way merge<br/>ős = bázis-SHA · miénk = piszkozat · övék = docs-sync HEAD
+
+    alt tiszta merge
+        G->>GH: commit (--author = szerző) + push → docs-sync
+        GH-->>G: ok
+        API->>L: lock felszabadítása
+        API->>D: piszkozat törlése
+        API-->>U: publikálva
+    else konfliktus (ugyanazt a részt írták)
+        G-->>API: konfliktus (övék vs. miénk)
+        API-->>U: barátságos felbontó (nem nyers markerek)
+        U->>API: feloldott tartalom
+        API->>G: újrapróba (feloldott)
+        G->>GH: commit (--author = szerző) + push → docs-sync
+        GH-->>G: ok
+        API->>L: lock felszabadítása
+        API->>D: piszkozat törlése
+        API-->>U: publikálva
+    end
+
+    Note over U,GH: 4. Propose to main — külön, szándékos lépés
+    U->>API: Propose to main
+    API->>G: PR nyitása
+    G->>GH: Pull Request (docs-sync → main)
+    GH-->>U: review / merge — mint a kódnál

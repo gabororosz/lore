@@ -1,0 +1,51 @@
+flowchart TB
+    subgraph CLIENT["Kliens"]
+        UI["Mobile-first web app<br/>WYSIWYG szerkesztő · read/edit/publish<br/>képfeltöltés · lock/presence · konfliktus-felbontó"]
+    end
+
+    subgraph LORE["Lore backend — hosted, multi-tenant SaaS"]
+        API["Alkalmazás-backend / API<br/>auth · Publish-orkesztráció · AI-orkesztráció"]
+        LOCK["Lock / presence<br/>soft lock + lejárat · realtime csatorna"]
+        AI["AI-szolgáltatás<br/>/docs-only"]
+        GIT["Git-integrációs réteg<br/>GitHub App · bot-identitás · --author commit"]
+        DRAFT[("Piszkozat-tár<br/>bázis-SHA · TTL · enc-at-rest")]
+        INDEX[("Derivált index<br/>id→fájl · link-gráf · keresés")]
+        MIRROR[("Sparse /docs mirror<br/>teljes commit-gráf")]
+    end
+
+    subgraph EXT["Külső rendszerek"]
+        GH[("GitHub<br/>igazságforrás — publikált tudás")]
+        LLM["LLM<br/>EU-adatrezidencia"]
+    end
+
+    %% Kliens ↔ backend
+    UI <-->|"read / edit / publish"| API
+
+    %% Backend belső kapcsolatok
+    API --> LOCK
+    API -->|"piszkozat mentése"| DRAFT
+    API -->|"olvasás / linkfeloldás"| INDEX
+    API -->|"szerkesztési feladat"| AI
+    API -->|"Publish / PR"| GIT
+    AI -->|"/docs + utasítás"| LLM
+    AI -.->|"módosított Markdown"| DRAFT
+
+    %% Git-réteg ↔ mirror ↔ index
+    GIT <-->|"3-way merge (bázis-SHA)"| MIRROR
+    MIRROR ==>|"index-újraépítés a diffre"| INDEX
+
+    %% Git-réteg ↔ GitHub
+    GIT ==>|"bot push → docs-sync · PR → main"| GH
+    GH -.->|"webhook: push (main / docs-sync)"| GIT
+    GH ==>|"sparse fetch /docs (blob:none)"| MIRROR
+
+    %% Tárolási filozófia szerinti kategóriák
+    classDef source fill:#e6f4ea,stroke:#137333,stroke-width:2px,color:#0b3d1c;
+    classDef derived fill:#e8f0fe,stroke:#1967d2,stroke-width:1.5px,stroke-dasharray:4 3,color:#0b2b66;
+    classDef transient fill:#fef7e0,stroke:#b06000,stroke-width:1.5px,color:#5c3200;
+    classDef service fill:#f1f3f4,stroke:#5f6368,stroke-width:1px,color:#202124;
+
+    class GH source;
+    class MIRROR,INDEX derived;
+    class DRAFT transient;
+    class API,LOCK,AI,GIT,UI,LLM service;
